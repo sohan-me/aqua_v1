@@ -671,6 +671,8 @@ export interface ItemService {
   user_username?: string;
   vendor: number | null;
   vendor_name?: string;
+  feed_type: number | null;
+  feed_type_name?: string;
   name: string;
   description: string;
   item_type: 'product' | 'service' | 'equipment' | 'feed' | 'medicine' | 'chemical' | 'other';

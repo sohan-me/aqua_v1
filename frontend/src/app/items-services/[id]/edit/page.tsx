@@ -1,17 +1,21 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useCreateItemService, useVendors, useFeedTypes } from '@/hooks/useApi';
+import { useState, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { useItemServiceById, useUpdateItemService, useVendors, useFeedTypes } from '@/hooks/useApi';
 import { extractApiData } from '@/lib/utils';
 import { Vendor, FeedType } from '@/lib/api';
 import { ArrowLeft, Save, X, Package } from 'lucide-react';
 import { toast } from 'sonner';
 import Link from 'next/link';
 
-export default function NewItemServicePage() {
+export default function EditItemServicePage() {
+  const params = useParams();
   const router = useRouter();
-  const createItemService = useCreateItemService();
+  const itemServiceId = parseInt(params.id as string);
+
+  const { data: itemService, isLoading: itemServiceLoading } = useItemServiceById(itemServiceId);
+  const updateItemService = useUpdateItemService();
   const { data: vendorsData } = useVendors();
   const { data: feedTypesData } = useFeedTypes();
   const vendors = extractApiData<Vendor>(vendorsData);
@@ -57,6 +61,33 @@ export default function NewItemServicePage() {
     return path;
   };
 
+  // Populate form when item service data loads
+  useEffect(() => {
+    if (itemService) {
+      setFormData({
+        vendor: itemService.data.vendor?.toString() || '',
+        name: itemService.data.name || '',
+        description: itemService.data.description || '',
+        item_type: itemService.data.item_type || 'product',
+        unit: itemService.data.unit || '',
+        feed_type: itemService.data.feed_type?.toString() || '',
+        unit_price: itemService.data.unit_price || '',
+        currency: itemService.data.currency || 'BDT',
+        stock_quantity: itemService.data.stock_quantity || '',
+        minimum_stock: itemService.data.minimum_stock || '',
+        is_active: itemService.data.is_active ?? true,
+        is_available: itemService.data.is_available ?? true,
+        specifications: itemService.data.specifications || '',
+        usage_instructions: itemService.data.usage_instructions || '',
+        storage_requirements: itemService.data.storage_requirements || '',
+        expiry_date: itemService.data.expiry_date || '',
+        tax_rate: itemService.data.tax_rate || '',
+        discount_percentage: itemService.data.discount_percentage || '',
+        notes: itemService.data.notes || ''
+      });
+    }
+  }, [itemService]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
     setFormData(prev => ({
@@ -82,18 +113,21 @@ export default function NewItemServicePage() {
         discount_percentage: formData.discount_percentage ? parseFloat(formData.discount_percentage) : null,
       };
 
-      await createItemService.mutateAsync(submitData);
-      router.push('/items-services');
+      await updateItemService.mutateAsync({ id: itemServiceId, data: submitData });
+      router.push(`/items-services/${itemServiceId}`);
     } catch (error) {
-      toast.error('Failed to create item/service');
+      toast.error('Failed to update item/service');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleCancel = () => {
-    router.push('/items-services');
+    router.push(`/items-services/${itemServiceId}`);
   };
+
+  if (itemServiceLoading) return <div className="flex justify-center items-center h-64">Loading...</div>;
+  if (!itemService) return <div className="text-red-600">Item/Service not found</div>;
 
   return (
     <div className="space-y-6">
@@ -101,16 +135,18 @@ export default function NewItemServicePage() {
       <div className="space-y-4">
         <div className="flex items-center">
           <Link
-            href="/items-services"
+            href={`/items-services/${itemServiceId}`}
             className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
           >
             <ArrowLeft className="h-5 w-5 mr-2" />
-            Back to Items & Services
+            Back to Item/Service
           </Link>
         </div>
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Add New Item/Service</h1>
-          <p className="text-gray-600 mt-1">Create a new item or service record</p>
+          <h1 className="text-3xl font-bold text-gray-900">Edit Item/Service</h1>
+          <p className="text-gray-600 mt-1">
+            {itemService.data.name}
+          </p>
         </div>
       </div>
 
@@ -180,7 +216,6 @@ export default function NewItemServicePage() {
                 ))}
               </select>
             </div>
-
 
             <div>
               <label htmlFor="unit" className="block text-sm font-medium text-gray-700 mb-2">
@@ -486,7 +521,7 @@ export default function NewItemServicePage() {
             className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md shadow-sm text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Save className="h-4 w-4 mr-2" />
-            {isSubmitting ? 'Creating...' : 'Create Item/Service'}
+            {isSubmitting ? 'Updating...' : 'Update Item/Service'}
           </button>
         </div>
       </form>

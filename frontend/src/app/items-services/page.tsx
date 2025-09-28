@@ -35,7 +35,6 @@ export default function ItemsServicesPage() {
   const filteredItems = items.filter(item => {
     const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (item.vendor_name && item.vendor_name.toLowerCase().includes(searchTerm.toLowerCase()));
     
     const matchesType = filterType === 'all' || item.item_type === filterType;
@@ -101,7 +100,7 @@ export default function ItemsServicesPage() {
 
       {/* Filters */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
             <div className="relative">
@@ -152,25 +151,25 @@ export default function ItemsServicesPage() {
       </div>
 
       {/* Items Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {filteredItems.map((item) => {
           const ItemIcon = getItemTypeIcon(item.item_type);
           return (
             <div key={item.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
               {/* Header */}
               <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-blue-100 rounded-lg">
+                <div className="flex items-center space-x-3 flex-1 min-w-0">
+                  <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0">
                     <ItemIcon className="h-5 w-5 text-blue-600" />
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">{item.name}</h3>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-semibold text-gray-900 truncate">{item.name}</h3>
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getItemTypeColor(item.item_type)}`}>
                       {item.item_type_display}
                     </span>
                   </div>
                 </div>
-                <div className="flex items-center space-x-1">
+                <div className="flex flex-col items-end space-y-1 ml-2">
                   {item.is_active ? (
                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                       Active
@@ -193,66 +192,61 @@ export default function ItemsServicesPage() {
                 <p className="text-sm text-gray-600 mb-4 line-clamp-2">{item.description}</p>
               )}
 
-              {/* Vendor */}
-              {item.vendor_name && (
-                <div className="flex items-center text-sm text-gray-600 mb-2">
-                  <Building2 className="h-4 w-4 mr-2" />
-                  {item.vendor_name}
-                </div>
-              )}
+              {/* Information Grid */}
+              <div className="space-y-2 mb-4">
+                {/* Vendor */}
+                {item.vendor_name && (
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Building2 className="h-4 w-4 mr-2 flex-shrink-0" />
+                    <span className="truncate">{item.vendor_name}</span>
+                  </div>
+                )}
 
-              {/* Category */}
-              {item.category && (
-                <div className="flex items-center text-sm text-gray-600 mb-2">
-                  <Package className="h-4 w-4 mr-2" />
-                  {item.category}
-                </div>
-              )}
+                {/* Price */}
+                {item.unit_price && (
+                  <div className="flex items-center text-sm text-gray-600">
+                    <DollarSign className="h-4 w-4 mr-2 flex-shrink-0" />
+                    <span>{item.currency} {parseFloat(item.unit_price).toLocaleString()} per {item.unit}</span>
+                  </div>
+                )}
 
-              {/* Price */}
-              {item.unit_price && (
-                <div className="flex items-center text-sm text-gray-600 mb-2">
-                  <DollarSign className="h-4 w-4 mr-2" />
-                  {item.currency} {parseFloat(item.unit_price).toLocaleString()} per {item.unit}
-                </div>
-              )}
+                {/* Stock */}
+                {item.stock_quantity && (
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Package className="h-4 w-4 mr-2 flex-shrink-0" />
+                    <span>Stock: {parseFloat(item.stock_quantity).toLocaleString()} {item.unit}</span>
+                  </div>
+                )}
 
-              {/* Stock */}
-              {item.stock_quantity && (
-                <div className="flex items-center text-sm text-gray-600 mb-2">
-                  <Package className="h-4 w-4 mr-2" />
-                  Stock: {parseFloat(item.stock_quantity).toLocaleString()} {item.unit}
-                </div>
-              )}
-
-              {/* Expiry Date */}
-              {item.expiry_date && (
-                <div className="flex items-center text-sm text-gray-600 mb-4">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  Expires: {new Date(item.expiry_date).toLocaleDateString()}
-                </div>
-              )}
+                {/* Expiry Date */}
+                {item.expiry_date && (
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Calendar className="h-4 w-4 mr-2 flex-shrink-0" />
+                    <span>Expires: {new Date(item.expiry_date).toLocaleDateString()}</span>
+                  </div>
+                )}
+              </div>
 
               {/* Actions */}
-              <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-4 border-t border-gray-200 space-y-2 sm:space-y-0">
                 <div className="flex items-center space-x-2">
                   <Link
                     href={`/items-services/${item.id}`}
-                    className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
+                    className="p-2 text-gray-400 hover:text-blue-600 transition-colors rounded-md hover:bg-blue-50"
                     title="View Details"
                   >
                     <Eye className="h-4 w-4" />
                   </Link>
                   <Link
                     href={`/items-services/${item.id}/edit`}
-                    className="p-2 text-gray-400 hover:text-green-600 transition-colors"
+                    className="p-2 text-gray-400 hover:text-green-600 transition-colors rounded-md hover:bg-green-50"
                     title="Edit Item/Service"
                   >
                     <Edit className="h-4 w-4" />
                   </Link>
                   <button
                     onClick={() => handleDelete(item.id, item.name)}
-                    className="p-2 text-gray-400 hover:text-red-600 transition-colors"
+                    className="p-2 text-gray-400 hover:text-red-600 transition-colors rounded-md hover:bg-red-50"
                     title="Delete Item/Service"
                   >
                     <Trash2 className="h-4 w-4" />

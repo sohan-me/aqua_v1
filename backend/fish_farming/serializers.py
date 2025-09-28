@@ -443,6 +443,7 @@ class CustomerSerializer(serializers.ModelSerializer):
 class ItemServiceSerializer(serializers.ModelSerializer):
     user_username = serializers.CharField(source='user.username', read_only=True)
     vendor_name = serializers.CharField(source='vendor.name', read_only=True)
+    feed_type_name = serializers.CharField(source='feed_type.name', read_only=True)
     item_type_display = serializers.CharField(source='get_item_type_display', read_only=True)
     
     class Meta:

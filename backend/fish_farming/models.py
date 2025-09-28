@@ -1171,6 +1171,7 @@ class ItemService(models.Model):
     ], default='product', help_text="Type of item or service")
     
     category = models.CharField(max_length=100, blank=True, help_text="Category (e.g., Feed, Medicine, Equipment)")
+    feed_type = models.ForeignKey(FeedType, on_delete=models.SET_NULL, null=True, blank=True, related_name='item_services', help_text="Feed type (only for feed items)")
     unit = models.CharField(max_length=50, blank=True, help_text="Unit of measurement (kg, liter, piece, etc.)")
     
     # Pricing

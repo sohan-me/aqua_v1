@@ -64,9 +64,16 @@ const navigation = [
       { name: 'Income', href: '/income', icon: DollarSign },
     ]
   },
-  { name: 'Items and Services', href: '/items-services', icon: Package },
-  { name: 'Vendors', href: '/vendors', icon: Building2 },
-  { name: 'Customers', href: '/customers', icon: User },
+  { 
+    name: 'Business', 
+    href: '/business', 
+    icon: Building2,
+    submenu: [
+      { name: 'Items and Services', href: '/items-services', icon: Package },
+      { name: 'Vendors', href: '/vendors', icon: Building2 },
+      { name: 'Customers', href: '/customers', icon: User },
+    ]
+  },
   { 
     name: 'Reports & Analysis', 
     href: '/reports', 
